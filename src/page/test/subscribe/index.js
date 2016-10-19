@@ -17,9 +17,14 @@
   var targetSubscriber;
   var targetView;
 
+  var startSubscriptionStats = window.red5proStartSubscriptionStats;
+  var stopSubscriptionState = window.red5proStopSubscriptionStats
   var updateStatusFromEvent = function (event) {
     var subTypes = red5pro.SubscriberEventTypes;
     switch (event.type) {
+        case subTypes.SUBSCRIBE_START:
+          startSubscriptionStats(targetSubscriber.getPeerConnection());
+          break;
         case subTypes.CONNECT_FAILURE:
         case subTypes.SUBSCRIBE_FAIL:
           shutdownVideoElement();
@@ -94,7 +99,7 @@
         return player.play();
       })
       .then(function () {
-        onSubscribeSuccess()
+        onSubscribeSuccess();
       })
       .catch(function (error) {
         var jsonError = typeof error === 'string' ? error : JSON.stringify(error, null, 2)
@@ -136,6 +141,7 @@
     function clearRefs () {
       targetSubscriber.off('*', onSubscriberEvent);
       targetSubscriber = targetView = undefined;
+      stopSubscriptionState();
     }
     unsubscribe().then(clearRefs).catch(clearRefs);
   });

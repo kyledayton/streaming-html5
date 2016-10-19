@@ -1,0 +1,31 @@
+<div id="subscription-stats"></div>
+<script>
+  (function (window) {
+
+    var timer = 0;
+
+    function updateStats (connection) {
+      return function () {
+        connection.getStats(null)
+          .then(function (res) {
+            Object.keys(res).forEach(function (key) {
+              var report = res[key];
+              console.log(JSON.stringify(report, null, 2));
+            })
+          });
+      }
+    }
+
+    function startSubStats (connection) {
+      timer = setInterval(updateStats(connection), 1000);
+    }
+
+    function stopSubStats () {
+      clearInterval(timer);
+    }
+
+    window.red5proStartSubscriptionStats = startSubStats;
+    window.red5proStopSubscriptionStats = stopSubStats;
+
+  })(window);
+</script>
