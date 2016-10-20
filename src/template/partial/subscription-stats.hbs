@@ -1,23 +1,41 @@
-<div id="subscription-stats"></div>
+<div id="subscription-stats" class="stats-button">
+  <p>
+    <span id="subscription-stats-state">Show</span> <span>Subscription Stats</span>
+  </p>
+</div>
+<script src="../../lib/muazkhan/getStats.js"></script>
 <script>
-  (function (window) {
+  (function (window, document) {
+    'use strict';
+
+    RTCPeerConnection.prototype.getPeerStats = window.getStats;
 
     var timer = 0;
+    var showStats = false;
+    var toggleButton = document.getElementById('subscription-stats');
+    var stateField = document.getElementById('subscription-stats-state');
+    toggleButton.addEventListener('click', function () {
+      showStats = !showStats;
+      stateField.innerText = showStats ? 'Hide' : 'Show'
+    });
 
-    function updateStats (connection) {
+    function updateStats (connection, timeout) {
       return function () {
-        connection.getStats(null)
-          .then(function (res) {
+        var isMoz = !!navigator.mozGetUserMedia
+        var source = isMoz ? connection.getSenders('video') : null;
+        connection.getPeerStats(null, function (res) {
             Object.keys(res).forEach(function (key) {
               var report = res[key];
-              console.log(JSON.stringify(report, null, 2));
+              if (showStats) {
+                console.log(JSON.stringify(report, null, 2));
+              }
             })
-          });
+          }, timeout);
       }
     }
 
     function startSubStats (connection) {
-      timer = setInterval(updateStats(connection), 1000);
+      updateStats(connection, 1000)();
     }
 
     function stopSubStats () {
@@ -27,5 +45,5 @@
     window.red5proStartSubscriptionStats = startSubStats;
     window.red5proStopSubscriptionStats = stopSubStats;
 
-  })(window);
+  })(window, document);
 </script>

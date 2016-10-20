@@ -133,6 +133,13 @@ code {
   width: 50%;
 }
 
+.stats-button {
+  background-color: #ccc;
+  padding: 1.2rem;
+  text-align: center;
+  cursor: pointer;
+}
+
 #back-link-container {
   cursor: pointer;
   width: 100%;
